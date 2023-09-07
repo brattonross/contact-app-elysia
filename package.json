@@ -1,15 +1,29 @@
 {
-  "name": "beth",
-  "version": "1.0.50",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
-  },
-  "dependencies": {
-    "elysia": "latest"
-  },
-  "devDependencies": {
-    "bun-types": "latest"
-  },
-  "module": "src/index.js"
+	"name": "beth",
+	"version": "1.0.0",
+	"scripts": {
+		"dev": "concurrently \"bun:dev:*\"",
+		"dev:server": "bun run --watch src/index.tsx",
+		"dev:styles": "tailwindcss -i ./src/styles.css -o ./public/styles.css --watch",
+		"lint": "biome check .",
+		"format": "biome format . --write"
+	},
+	"dependencies": {
+		"@elysiajs/html": "^0.6.4",
+		"@elysiajs/static": "^0.6.0",
+		"elysia": "^0.6.20"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.1.2",
+		"@faker-js/faker": "^8.0.2",
+		"@radix-ui/colors": "^2.1.0",
+		"@tailwindcss/forms": "^0.5.6",
+		"bun-types": "latest",
+		"concurrently": "^8.2.1",
+		"tailwindcss": "^3.3.3",
+		"windy-radix-palette": "^0.6.1"
+	},
+	"peerDependencies": {
+		"typescript": "^5.2.2"
+	}
 }
