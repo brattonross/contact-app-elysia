@@ -37,6 +37,9 @@ export function EditContact({
 						<label for="email">Email</label>
 						<input
 							id="email"
+							hx-get={`/contacts/${defaultValues.id}/email`}
+							hx-target="#email_error"
+							hx-trigger="change, keyup delay:300ms changed"
 							name="email"
 							type="email"
 							value={defaultValues.email}

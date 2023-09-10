@@ -87,6 +87,26 @@ const app = new Elysia()
 		}
 		return <ViewContact contact={contact} />;
 	})
+	.get(
+		"/contacts/:id/email",
+		(context) => {
+			const contact = db.find(Number(context.params.id));
+			if (!contact) {
+				context.set.status = 404;
+				return <div>Not Found</div>;
+			}
+			const contacts = db.search(context.query.email);
+			if (contacts.length > 1 || contacts.some((c) => c.id !== contact.id)) {
+				return "Email already in use.";
+			}
+			return "";
+		},
+		{
+			query: t.Object({
+				email: t.String(),
+			}),
+		},
+	)
 	.get("/contacts/:id/edit", (context) => {
 		const contact = db.find(Number(context.params.id));
 		if (!contact) {
@@ -112,6 +132,7 @@ const app = new Elysia()
 				}),
 				email: t.String({
 					minLength: 1,
+					format: "email",
 				}),
 				phone_number: t.String({
 					minLength: 1,
