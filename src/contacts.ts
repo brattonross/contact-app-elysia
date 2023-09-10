@@ -56,6 +56,18 @@ class ContactsDb {
 			id: result.id,
 		};
 	}
+
+	public find(id: number): Contact | null {
+		const query = this.#db.prepare("select * from contacts where id = ?");
+		const contact = query.get(id);
+		if (!contact) {
+			return null;
+		}
+		if (!Value.Check(contactSchema, contact)) {
+			throw new Error("Invalid contact");
+		}
+		return contact;
+	}
 }
 
 export const db = new ContactsDb(

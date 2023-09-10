@@ -5,6 +5,7 @@ import { db, type Contact } from "~/contacts.ts";
 import { Contacts } from "~/contacts.tsx";
 import { flash } from "~/flash";
 import { NewContact } from "~/new-contact.tsx";
+import { ViewContact } from "./contact";
 
 const app = new Elysia()
 	// @ts-expect-error
@@ -77,6 +78,14 @@ const app = new Elysia()
 			},
 		},
 	)
+	.get("/contacts/:id", (context) => {
+		const contact = db.find(Number(context.params.id));
+		if (!contact) {
+			context.set.status = 404;
+			return <div>Not Found</div>;
+		}
+		return <ViewContact contact={contact} />;
+	})
 	.listen(3000);
 
 console.log(
