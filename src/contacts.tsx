@@ -15,10 +15,43 @@ export function Contacts({
 	return (
 		<Layout>
 			<div>
-				<form action="/contacts" method="GET">
+				<form action="/contacts" method="GET" class="flex items-center gap-2">
 					<label for="search">Search</label>
-					<input id="search" name="q" type="search" value={search} />
+					<input
+						id="search"
+						hx-get="/contacts"
+						hx-trigger="search, keyup delay:200ms changed"
+						hx-target="tbody"
+						hx-select="tbody tr"
+						hx-push-url="true"
+						hx-indicator="#spinner"
+						name="q"
+						type="search"
+						value={search}
+					/>
 					<button type="submit">Search</button>
+					<span id="spinner" class="htmx-indicator">
+						<svg
+							class="animate-spin h-6 w-6 text-white"
+							fill="none"
+							viewBox="0 0 24 24"
+						>
+							<title>Loading...</title>
+							<circle
+								class="opacity-25"
+								cx="12"
+								cy="12"
+								r="10"
+								stroke="currentColor"
+								stroke-width="4"
+							/>
+							<path
+								class="opacity-75"
+								fill="currentColor"
+								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+							/>
+						</svg>
+					</span>
 				</form>
 				<table>
 					<thead>
@@ -31,18 +64,7 @@ export function Contacts({
 						</tr>
 					</thead>
 					<tbody>
-						{contacts.map((contact) => (
-							<tr key={contact.id}>
-								<td>{contact.first_name}</td>
-								<td>{contact.last_name}</td>
-								<td>{contact.phone_number}</td>
-								<td>{contact.email}</td>
-								<td>
-									<a href={`/contacts/${contact.id}/edit`}>Edit</a>
-									<a href={`/contacts/${contact.id}`}>View</a>
-								</td>
-							</tr>
-						))}
+						<Rows contacts={contacts} />
 						{page < totalPages ? (
 							<tr>
 								<td colspan={5} class="text-center">
@@ -66,5 +88,24 @@ export function Contacts({
 				</p>
 			</div>
 		</Layout>
+	);
+}
+
+export function Rows({ contacts }: { contacts: Array<Contact> }) {
+	return (
+		<>
+			{contacts.map((contact) => (
+				<tr key={contact.id}>
+					<td>{contact.first_name}</td>
+					<td>{contact.last_name}</td>
+					<td>{contact.phone_number}</td>
+					<td>{contact.email}</td>
+					<td>
+						<a href={`/contacts/${contact.id}/edit`}>Edit</a>
+						<a href={`/contacts/${contact.id}`}>View</a>
+					</td>
+				</tr>
+			))}
+		</>
 	);
 }

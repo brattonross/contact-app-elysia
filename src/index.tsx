@@ -2,7 +2,7 @@ import { html } from "@elysiajs/html";
 import { staticPlugin } from "@elysiajs/static";
 import { Elysia, t } from "elysia";
 import { db, type Contact } from "~/contacts.ts";
-import { Contacts } from "~/contacts.tsx";
+import { Contacts, Rows } from "~/contacts.tsx";
 import { flash } from "~/flash";
 import { NewContact } from "~/new-contact.tsx";
 import { ViewContact } from "./contact";
@@ -15,12 +15,17 @@ const app = new Elysia()
 	.get("/", (context) => {
 		context.set.redirect = "/contacts";
 	})
-	.get("/contacts", ({ query }) => {
+	.get("/contacts", ({ query, request }) => {
 		const search = typeof query.q === "string" ? query.q : undefined;
 		const page = Number(query.page) || 1;
 		const { contacts, totalPages } = search
 			? db.search({ search, page })
 			: db.all({ page });
+
+		if (search && request.headers.get("HX-Trigger") === "search") {
+			return <Rows contacts={contacts} />;
+		}
+
 		return (
 			<Contacts
 				contacts={contacts}
