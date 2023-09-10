@@ -3,8 +3,15 @@ import { Layout } from "./layout";
 
 export function Contacts({
 	contacts,
+	page = 1,
 	search,
-}: { contacts: Array<Contact>; search?: string }) {
+	totalPages = 1,
+}: {
+	contacts: Array<Contact>;
+	page?: number;
+	search?: string;
+	totalPages?: number;
+}) {
 	return (
 		<Layout>
 			<div>
@@ -38,6 +45,14 @@ export function Contacts({
 						))}
 					</tbody>
 				</table>
+				<div>
+					{page > 1 ? (
+						<a href={`/contacts?page=${page - 1}`}>Previous</a>
+					) : null}
+					{page < totalPages ? (
+						<a href={`/contacts?page=${page + 1}`}>Next</a>
+					) : null}
+				</div>
 				<p>
 					<a href="/contacts/new">Add Contact</a>
 				</p>

@@ -15,19 +15,21 @@ const app = new Elysia()
 	.get("/", (context) => {
 		context.set.redirect = "/contacts";
 	})
-	.get(
-		"/contacts",
-		({ query }) => {
-			const search = query.q;
-			const contacts = search ? db.search(search) : db.all();
-			return <Contacts contacts={contacts} search={search} />;
-		},
-		{
-			query: t.Object({
-				q: t.Optional(t.String()),
-			}),
-		},
-	)
+	.get("/contacts", ({ query }) => {
+		const search = typeof query.q === "string" ? query.q : undefined;
+		const page = Number(query.page) || 1;
+		const { contacts, totalPages } = search
+			? db.search({ search, page })
+			: db.all({ page });
+		return (
+			<Contacts
+				contacts={contacts}
+				page={page}
+				search={search}
+				totalPages={totalPages}
+			/>
+		);
+	})
 	.get("/contacts/new", () => {
 		return <NewContact />;
 	})
@@ -95,7 +97,9 @@ const app = new Elysia()
 				context.set.status = 404;
 				return <div>Not Found</div>;
 			}
-			const contacts = db.search(context.query.email);
+			const { contacts } = db.search({
+				search: contact.email,
+			});
 			if (contacts.length > 1 || contacts.some((c) => c.id !== contact.id)) {
 				return "Email already in use.";
 			}

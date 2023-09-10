@@ -20,25 +20,69 @@ class ContactsDb {
 		this.#db = db;
 	}
 
-	public all(): Array<Contact> {
-		const query = this.#db.prepare("select * from contacts");
-		const contacts = query.all();
+	public all({
+		page = 1,
+		pageSize = 10,
+	}: {
+		page?: number;
+		pageSize?: number;
+	}): { contacts: Array<Contact>; total: number; totalPages: number } {
+		const query = this.#db.prepare("select * from contacts limit ? offset ?");
+		const contacts = query.all(pageSize, (page - 1) * pageSize);
 		if (!Value.Check(t.Array(contactSchema), contacts)) {
 			throw new Error("Invalid contacts");
 		}
-		return contacts;
+
+		const result = this.#db
+			.prepare("select count(*) as total from contacts")
+			.get();
+		if (!Value.Check(t.Object({ total: t.Number() }), result)) {
+			throw new Error("Invalid total");
+		}
+		const { total } = result;
+		return {
+			contacts,
+			total,
+			totalPages: Math.ceil(total / pageSize),
+		};
 	}
 
-	public search(term: string): Array<Contact> {
+	public search({
+		search,
+		page = 1,
+		pageSize = 10,
+	}: { search: string; page?: number; pageSize?: number }): {
+		contacts: Array<Contact>;
+		total: number;
+		totalPages: number;
+	} {
 		const query = this.#db.prepare(
-			"select * from contacts where first_name like ? or last_name like ? or email like ? or phone_number like ?",
+			"select * from contacts where first_name like ? or last_name like ? limit ? offset ?",
 		);
-		const q = `%${term}%`;
-		const contacts = query.all(q, q, q, q);
+		const contacts = query.all(
+			`%${search}%`,
+			`%${search}%`,
+			pageSize,
+			(page - 1) * pageSize,
+		);
 		if (!Value.Check(t.Array(contactSchema), contacts)) {
 			throw new Error("Invalid contacts");
 		}
-		return contacts;
+
+		const result = this.#db
+			.prepare(
+				"select count(*) as total from contacts where first_name like ? or last_name like ?",
+			)
+			.get(`%${search}%`, `%${search}%`);
+		if (!Value.Check(t.Object({ total: t.Number() }), result)) {
+			throw new Error("Invalid total");
+		}
+		const { total } = result;
+		return {
+			contacts,
+			total,
+			totalPages: Math.ceil(total / pageSize),
+		};
 	}
 
 	public create(contact: Omit<Contact, "id">): Contact {
