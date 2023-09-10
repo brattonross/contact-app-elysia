@@ -85,6 +85,11 @@ class ContactsDb {
 			id,
 		};
 	}
+
+	public delete(id: number): void {
+		const query = this.#db.prepare("delete from contacts where id = ?");
+		query.run(id);
+	}
 }
 
 export const db = new ContactsDb(

@@ -148,6 +148,11 @@ const app = new Elysia()
 			},
 		},
 	)
+	.post("/contacts/:id/delete", (context) => {
+		db.delete(Number(context.params.id));
+		flash.success("Deleted contact!");
+		context.set.redirect = "/contacts";
+	})
 	.listen(3000);
 
 console.log(
