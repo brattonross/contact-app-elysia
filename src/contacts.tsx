@@ -43,16 +43,23 @@ export function Contacts({
 								</td>
 							</tr>
 						))}
+						{page < totalPages ? (
+							<tr>
+								<td colspan={5} class="text-center">
+									<button
+										hx-target="closest tr"
+										hx-swap="outerHTML"
+										hx-select="tbody > tr"
+										hx-get={`/contacts?page=${page + 1}`}
+										type="button"
+									>
+										Load more
+									</button>
+								</td>
+							</tr>
+						) : null}
 					</tbody>
 				</table>
-				<div>
-					{page > 1 ? (
-						<a href={`/contacts?page=${page - 1}`}>Previous</a>
-					) : null}
-					{page < totalPages ? (
-						<a href={`/contacts?page=${page + 1}`}>Next</a>
-					) : null}
-				</div>
 				<p>
 					<a href="/contacts/new">Add Contact</a>
 				</p>
