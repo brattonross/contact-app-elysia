@@ -6,6 +6,7 @@ import { Contacts } from "~/contacts.tsx";
 import { flash } from "~/flash";
 import { NewContact } from "~/new-contact.tsx";
 import { ViewContact } from "./contact";
+import { EditContact } from "./edit-contact";
 
 const app = new Elysia()
 	// @ts-expect-error
@@ -86,6 +87,67 @@ const app = new Elysia()
 		}
 		return <ViewContact contact={contact} />;
 	})
+	.get("/contacts/:id/edit", (context) => {
+		const contact = db.find(Number(context.params.id));
+		if (!contact) {
+			context.set.status = 404;
+			return <div>Not Found</div>;
+		}
+		return <EditContact defaultValues={contact} />;
+	})
+	.post(
+		"/contacts/:id/edit",
+		(context) => {
+			db.update(Number(context.params.id), context.body);
+			flash.success("Updated contact!");
+			context.set.redirect = `/contacts/${context.params.id}`;
+		},
+		{
+			body: t.Object({
+				first_name: t.String({
+					minLength: 1,
+				}),
+				last_name: t.String({
+					minLength: 1,
+				}),
+				email: t.String({
+					minLength: 1,
+				}),
+				phone_number: t.String({
+					minLength: 1,
+				}),
+			}),
+			error: (context) => {
+				if (context.code !== "VALIDATION") {
+					return;
+				}
+
+				const errors: Record<keyof Omit<Contact, "id">, string> = {
+					first_name: "",
+					last_name: "",
+					email: "",
+					phone_number: "",
+				};
+				for (let i = 0; i < context.error.all.length; i++) {
+					const error = context.error.all[i];
+					const prop = error.path.slice(1);
+					errors[prop as keyof Omit<Contact, "id">] = error.message;
+				}
+				context.set.headers["Content-Type"] = "text/html";
+				const pathname = new URL(context.request.url).pathname.split("/");
+				const id = pathname[pathname.length - 2];
+				return (
+					<EditContact
+						defaultValues={{
+							...(context.error.value as Omit<Contact, "id">),
+							id: Number(id),
+						}}
+						errors={errors}
+					/>
+				);
+			},
+		},
+	)
 	.listen(3000);
 
 console.log(

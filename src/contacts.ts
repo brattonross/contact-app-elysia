@@ -68,6 +68,23 @@ class ContactsDb {
 		}
 		return contact;
 	}
+
+	public update(id: number, contact: Omit<Contact, "id">): Contact {
+		const query = this.#db.prepare(
+			"update contacts set first_name = ?, last_name = ?, email = ?, phone_number = ? where id = ?",
+		);
+		query.run(
+			contact.first_name,
+			contact.last_name,
+			contact.email,
+			contact.phone_number,
+			id,
+		);
+		return {
+			...contact,
+			id,
+		};
+	}
 }
 
 export const db = new ContactsDb(
