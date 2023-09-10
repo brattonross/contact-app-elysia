@@ -48,6 +48,7 @@ export function Contacts({
 								<td colspan={5} class="text-center">
 									<button
 										hx-target="closest tr"
+										hx-trigger="revealed"
 										hx-swap="outerHTML"
 										hx-select="tbody > tr"
 										hx-get={`/contacts?page=${page + 1}`}
