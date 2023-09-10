@@ -12,7 +12,11 @@ export function Layout({ children }: PropsWithChildren) {
 				<script src="https://unpkg.com/htmx.org@1.9.5" />
 				<script src="https://unpkg.com/hyperscript.org@0.9.11" />
 			</head>
-			<body class="bg-white text-slate-12 antialiased dark:bg-slate-1">
+			<body
+				class="bg-white text-slate-12 antialiased dark:bg-slate-1"
+				hx-boost="true"
+				_="on htmx:beforeSwap(event) set event.detail.shouldSwap to true"
+			>
 				{children}
 				<div class="fixed bottom-0 right-0 p-4">
 					<ul class="flex flex-col gap-2">
