@@ -95,7 +95,10 @@ export function Rows({ contacts }: { contacts: Array<Contact> }) {
 	return (
 		<>
 			{contacts.map((contact) => (
-				<tr key={contact.id}>
+				<tr
+					key={contact.id}
+					class="[&.htmx-swapping]:opacity-0 [&.htmx-swapping]:transition-opacity [&.htmx-swapping]:duration-1000 [&.htmx-swapping]:ease-out"
+				>
 					<td>{contact.first_name}</td>
 					<td>{contact.last_name}</td>
 					<td>{contact.phone_number}</td>
@@ -103,6 +106,15 @@ export function Rows({ contacts }: { contacts: Array<Contact> }) {
 					<td>
 						<a href={`/contacts/${contact.id}/edit`}>Edit</a>
 						<a href={`/contacts/${contact.id}`}>View</a>
+						<button
+							hx-delete={`/contacts/${contact.id}`}
+							hx-swap="outerHTML swap:1s"
+							hx-confirm="Are you sure you want to delete this contact?"
+							hx-target="closest tr"
+							type="button"
+						>
+							Delete
+						</button>
 					</td>
 				</tr>
 			))}

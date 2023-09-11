@@ -181,12 +181,17 @@ const app = new Elysia()
 	.delete("/contacts/:id", (context) => {
 		db.delete(Number(context.params.id));
 		flash.success("Deleted contact!");
-		return new Response(null, {
-			status: 303,
-			headers: {
-				Location: "/contacts",
-			},
-		});
+
+		if (context.request.headers.get("HX-Trigger") === "edit-delete-button") {
+			return new Response(null, {
+				status: 303,
+				headers: {
+					Location: "/contacts",
+				},
+			});
+		}
+
+		return "";
 	})
 	.listen(3000);
 

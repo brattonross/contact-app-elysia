@@ -60,6 +60,7 @@ export function EditContact({
 				<button type="submit">Submit</button>
 			</form>
 			<button
+				id="edit-delete-button"
 				hx-delete={`/contacts/${defaultValues.id}`}
 				hx-push-url="true"
 				hx-confirm="Are you sure you want to delete this contact?"
