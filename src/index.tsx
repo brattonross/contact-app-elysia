@@ -35,6 +35,25 @@ const app = new Elysia()
 			/>
 		);
 	})
+	.delete(
+		"/contacts",
+		(context) => {
+			const ids = context.body.selected_contact_ids.map(Number);
+			db.deleteMany(ids);
+			flash.success("Deleted contacts!");
+
+			const page = 1;
+			const { contacts, totalPages } = db.all();
+			return (
+				<Contacts contacts={contacts} page={page} totalPages={totalPages} />
+			);
+		},
+		{
+			body: t.Object({
+				selected_contact_ids: t.Array(t.String()),
+			}),
+		},
+	)
 	.get("/contacts/new", () => {
 		return <NewContact />;
 	})

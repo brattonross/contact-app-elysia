@@ -53,36 +53,47 @@ export function Contacts({
 						</svg>
 					</span>
 				</form>
-				<table>
-					<thead>
-						<tr>
-							<th>First</th>
-							<th>Last</th>
-							<th>Phone</th>
-							<th>Email</th>
-							<th />
-						</tr>
-					</thead>
-					<tbody>
-						<Rows contacts={contacts} />
-						{page < totalPages ? (
+				<form>
+					<button
+						hx-delete="/contacts"
+						hx-confirm="Are you sure you want to delete the selected contacts?"
+						hx-target="body"
+						type="button"
+					>
+						Delete selected
+					</button>
+					<table>
+						<thead>
 							<tr>
-								<td colspan={5} class="text-center">
-									<button
-										hx-target="closest tr"
-										hx-trigger="revealed"
-										hx-swap="outerHTML"
-										hx-select="tbody > tr"
-										hx-get={`/contacts?page=${page + 1}`}
-										type="button"
-									>
-										Load more
-									</button>
-								</td>
+								<th />
+								<th>First</th>
+								<th>Last</th>
+								<th>Phone</th>
+								<th>Email</th>
+								<th />
 							</tr>
-						) : null}
-					</tbody>
-				</table>
+						</thead>
+						<tbody>
+							<Rows contacts={contacts} />
+							{page < totalPages ? (
+								<tr>
+									<td colspan={5} class="text-center">
+										<button
+											hx-target="closest tr"
+											hx-trigger="revealed"
+											hx-swap="outerHTML"
+											hx-select="tbody > tr"
+											hx-get={`/contacts?page=${page + 1}`}
+											type="button"
+										>
+											Load more
+										</button>
+									</td>
+								</tr>
+							) : null}
+						</tbody>
+					</table>
+				</form>
 				<p>
 					<a href="/contacts/new">Add Contact</a>
 				</p>
@@ -99,6 +110,13 @@ export function Rows({ contacts }: { contacts: Array<Contact> }) {
 					key={contact.id}
 					class="[&.htmx-swapping]:opacity-0 [&.htmx-swapping]:transition-opacity [&.htmx-swapping]:duration-1000 [&.htmx-swapping]:ease-out"
 				>
+					<td>
+						<input
+							name="selected_contact_ids"
+							type="checkbox"
+							value={String(contact.id)}
+						/>
+					</td>
 					<td>{contact.first_name}</td>
 					<td>{contact.last_name}</td>
 					<td>{contact.phone_number}</td>

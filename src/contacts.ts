@@ -26,7 +26,7 @@ class ContactsDb {
 	}: {
 		page?: number;
 		pageSize?: number;
-	}): { contacts: Array<Contact>; total: number; totalPages: number } {
+	} = {}): { contacts: Array<Contact>; total: number; totalPages: number } {
 		const query = this.#db.prepare("select * from contacts limit ? offset ?");
 		const contacts = query.all(pageSize, (page - 1) * pageSize);
 		if (!Value.Check(t.Array(contactSchema), contacts)) {
@@ -133,6 +133,13 @@ class ContactsDb {
 	public delete(id: number): void {
 		const query = this.#db.prepare("delete from contacts where id = ?");
 		query.run(id);
+	}
+
+	public deleteMany(ids: Array<number>): void {
+		const query = this.#db.prepare(
+			`delete from contacts where id in (${ids.map(() => "?").join(", ")})`,
+		);
+		query.run(...ids);
 	}
 }
 
